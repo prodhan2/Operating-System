@@ -89,5 +89,4 @@ Average Waiting Time: 7.00 ms
 ✅ **Calculates waiting time** for each process  
 ✅ **Displays formatted output**  
 ✅ **Computes average waiting time**  
-
-Let me know if you need modifications! 🚀
+SUJAN PRODHAN(CSE - UNIVERSITY OF RAJSHAHI) 🚀
