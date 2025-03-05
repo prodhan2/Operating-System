@@ -1,92 +1,66 @@
 
 
 ```cpp
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 using namespace std;
-
-struct Process {
-    int id, burstTime, waitingTime;
-};
-
-// Comparator function to sort processes by burst time (SJF)
-bool compare(Process a, Process b) {
-    return a.burstTime < b.burstTime;
-}
 
 int main() {
     int n;
-    cout << "Enter number of processes: ";
+
+    cout << "How many processes? ";
     cin >> n;
 
-    vector<Process> processes(n);
-
-    // Input burst time for each process
-    cout << "Enter Burst Time for each process:\n";
+    int burstTime[n];
+    cout << "Enter burst times: ";
     for (int i = 0; i < n; i++) {
-        processes[i].id = i + 1;
-        cout << "P" << processes[i].id << ": ";
-        cin >> processes[i].burstTime;
+        cin >> burstTime[i];
     }
 
-    // Sorting processes by burst time (SJF)
-    sort(processes.begin(), processes.end(), compare);
+    // Sorting burst times in ascending order (SJF)
+    sort(burstTime, burstTime + n);
 
-    int totalWaitingTime = 0, sum = 0;
-    
-    // Calculating waiting time
-    processes[0].waitingTime = 0; // First process has 0 waiting time
-    for (int i = 1; i < n; i++) {
-        sum += processes[i - 1].burstTime;
-        processes[i].waitingTime = sum;
-        totalWaitingTime += processes[i].waitingTime;
-    }
+    int sum = 0, totalWaitingTime = 0;
 
-    // Displaying process waiting times
-    cout << "\nProcess | Burst Time | Waiting Time\n";
-    cout << "-----------------------------------\n";
+    // Calculating total waiting time
     for (int i = 0; i < n; i++) {
-        cout << "   P" << processes[i].id << "    |     " 
-             << processes[i].burstTime << " ms   |     " 
-             << processes[i].waitingTime << " ms\n";
+        cout << "Waiting time for P" << i + 1 << ": " << sum << " ms" << endl;
+        totalWaitingTime += sum;
+        sum += burstTime[i];
     }
 
-    // Calculating and displaying average waiting time
+    // Calculating average waiting time
     double avgWaitingTime = (double)totalWaitingTime / n;
     cout << fixed << setprecision(2);
-    cout << "\nAverage Waiting Time: " << avgWaitingTime << " ms\n";
+    cout << "Average Waiting Time: " << avgWaitingTime << " ms" << endl;
 
     return 0;
 }
 ```
 
----
+### **Explanation of Changes**:
+1. **Sort Syntax Fix**: You missed the correct syntax for the `sort()` function. It should be:
+   ```cpp
+   sort(burstTime, burstTime + n);
+   ```
+   This sorts the array of burst times in ascending order (since we are using Shortest Job First (SJF) Scheduling).
 
-### **Example Output**
+2. **Waiting Time Output**: When printing the waiting time, I adjusted the loop to print `P` followed by the process number. The loop now correctly prints for each process in sequence, starting from `P1` (1-indexed).
+
+### **Example Output**:
+
 ```
-Enter number of processes: 4
-Enter Burst Time for each process:
-P1: 6
-P2: 8
-P3: 7
-P4: 3
-
-Process | Burst Time | Waiting Time
------------------------------------
-   P4    |     3 ms   |     0 ms
-   P1    |     6 ms   |     3 ms
-   P3    |     7 ms   |     9 ms
-   P2    |     8 ms   |     16 ms
-
+How many processes? 4
+Enter burst times: 6 8 7 3
+Waiting time for P1: 0 ms
+Waiting time for P2: 3 ms
+Waiting time for P3: 9 ms
+Waiting time for P4: 16 ms
 Average Waiting Time: 7.00 ms
 ```
 
----
+### **What’s happening in the program**:
+- First, we read the number of processes and burst times.
+- Then, we sort the burst times in ascending order for SJF.
+- We calculate the waiting time for each process by keeping a running sum of the burst times.
+- Finally, we calculate and print the average waiting time.
 
-### **Key Features:**
-✅ Uses `#include<bits/stdc++.h>` for simplicity  
-✅ Uses **struct** to store process data  
-✅ **Sorts processes** by burst time (SJF)  
-✅ **Calculates waiting time** for each process  
-✅ **Displays formatted output**  
-✅ **Computes average waiting time**  
-SUJAN PRODHAN(CSE - UNIVERSITY OF RAJSHAHI) 🚀
