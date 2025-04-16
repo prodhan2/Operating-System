@@ -50,6 +50,11 @@ int main()
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);
 
+// 👉 সরাসরি ফাংশন কল করে দেখা main থ্রেড কোন কোরে চলছে
+    printf("\n--- Direct Function Calls from main() ---\n");
+    addition(NULL);
+    subtraction(NULL);
+
     return 0;
 }
 ```
@@ -59,4 +64,8 @@ int main()
 ```text
 Addition thread running on CPU core: 2
 Subtraction thread running on CPU core: 3
+
+--- Direct Function Calls from main() ---
+Addition thread running on CPU core: 0
+Subtraction thread running on CPU core: 0
 ```
