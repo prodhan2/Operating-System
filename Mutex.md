@@ -9,7 +9,7 @@
 ### ✅ Final Single Mutex Thread Example (With Bengali Comments)
 
 ```cpp
-#define _GNU_SOURCE
+#define GNU_GNU_SOURCE
 #include <bits/stdc++.h>
 #include <unistd.h>
 #include <pthread.h>
