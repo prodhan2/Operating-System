@@ -71,3 +71,67 @@ struct msgbuf {
 * অনেক সময় proper synchronization করতে হয়
 
 ---
+
+
+```c
+#include <stdlib.h>     // স্ট্যান্ডার্ড লাইব্রেরি ফাংশনের জন্য
+#include <unistd.h>     // ফর্ক ও অন্যান্য সিস্টেম কলের জন্য
+#include <sys/wait.h>   // wait() ফাংশনের জন্য
+#include <sys/msg.h>    // ম্যাসেজ কিউ সম্পর্কিত ফাংশনের জন্য
+#include <stdio.h>      // ইনপুট আউটপুটের জন্য (printf, perror)
+#include <string.h>     // স্ট্রিং কপি করার জন্য (strcpy)
+
+// ম্যাসেজ কিউ এর জন্য স্ট্রাকচার ডিফাইন
+struct msg_queue {
+    long type;         // ম্যাসেজ টাইপ (অবশ্যই long এবং > 0 হতে হবে)
+    char text[80];     // ম্যাসেজ টেক্সট রাখার জন্য
+};
+
+int main() {
+    struct msg_queue msg;          // msg_queue টাইপের একটি ভেরিয়েবল তৈরি
+    key_t key = 1234;              // ম্যাসেজ কিউ চিহ্নিত করার জন্য একটি নির্দিষ্ট কী
+
+    // ম্যাসেজ কিউ তৈরি করা হচ্ছে (অথবা আগেরটা পাওয়া গেলে সেটা রিটার্ন করবে)
+    int msqid = msgget(key, 0666 | IPC_CREAT);
+    if (msqid == -1) {             // যদি ম্যাসেজ কিউ তৈরি ব্যর্থ হয়
+        perror("msgget");         // এরর মেসেজ প্রিন্ট করে
+        exit(EXIT_FAILURE);       // প্রোগ্রাম বন্ধ করে দেয়
+    }
+
+    pid_t pid = fork();           // একটি নতুন প্রসেস তৈরি করা হচ্ছে
+
+    if (pid == 0) {
+        // চাইল্ড প্রসেস
+        printf("Child\n");         // চাইল্ড প্রসেস চলছে
+
+        msg.type = 1;              // ম্যাসেজ টাইপ ১ সেট করা হচ্ছে (অবশ্যই > 0)
+        strcpy(msg.text, "Hello, Parent\n");   // ম্যাসেজ কন্টেন্ট কপি করা হচ্ছে
+
+        // ম্যাসেজ পাঠানো হচ্ছে কিউ-তে
+        if (msgsnd(msqid, &msg, sizeof(msg.text), 0) == -1) {
+            perror("msgsnd");     // ম্যাসেজ পাঠাতে ব্যর্থ হলে এরর দেখাবে
+            exit(EXIT_FAILURE);   // প্রোগ্রাম বন্ধ
+        }
+    } else {
+        // প্যারেন্ট প্রসেস
+        printf("Parent\n");       // প্যারেন্ট প্রসেস চলছে
+
+        int status;
+        wait(&status);            // চাইল্ড প্রসেস শেষ হওয়া পর্যন্ত অপেক্ষা করা হচ্ছে
+
+        // ম্যাসেজ কিউ থেকে ম্যাসেজ রিসিভ করা হচ্ছে
+        if (msgrcv(msqid, &msg, sizeof(msg.text), 1, 0) == -1) {
+            perror("msgrcv");     // রিসিভ করতে সমস্যা হলে এরর দেখাবে
+            exit(EXIT_FAILURE);   // প্রোগ্রাম বন্ধ
+        }
+
+        printf("Received message: %s", msg.text);  // রিসিভ করা ম্যাসেজ প্রিন্ট করা হচ্ছে
+
+        // ম্যাসেজ কিউ ডিলিট করে ফেলা হচ্ছে
+        msgctl(msqid, IPC_RMID, NULL);
+    }
+
+    return 0;   // প্রোগ্রাম সফলভাবে শেষ
+}
+```
+
